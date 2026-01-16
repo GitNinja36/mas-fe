@@ -1,6 +1,6 @@
 import type { AgentSummary, QuestionResult, AgentMode } from './types'
 
-const API_BASE = 'http://127.0.0.1:8000'
+const API_BASE = import.meta.env.VITE_API_BASE ?? 'http://127.0.0.1:8000'
 
 export async function fetchAgents(): Promise<AgentSummary[]> {
   try {
