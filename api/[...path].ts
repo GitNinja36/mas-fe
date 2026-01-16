@@ -1,6 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 
-const API_BASE_URL = process.env.VITE_API_BASE || 'https://api-surveys.banza.xyz'
+// Use VITE_API_BASE if set, otherwise default to production API
+// Note: In Vercel, set this as an environment variable
+const API_BASE_URL = process.env.VITE_API_BASE || process.env.API_BASE_URL || 'https://api-surveys.banza.xyz'
 
 export default async function handler(
   req: VercelRequest,
