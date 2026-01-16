@@ -18,8 +18,19 @@ export default async function handler(
   }
 
   // Get the path from the request
-  const path = (req.query.path as string[]) || []
-  const apiPath = path.join('/')
+  // In Vercel, catch-all routes use req.query.path as an array
+  const pathArray = req.query.path as string[] | string | undefined
+  let apiPath = ''
+  
+  if (Array.isArray(pathArray)) {
+    apiPath = pathArray.join('/')
+  } else if (typeof pathArray === 'string') {
+    apiPath = pathArray
+  } else {
+    // Fallback: try to get from URL
+    const urlPath = req.url?.split('?')[0]?.replace('/api/', '') || ''
+    apiPath = urlPath
+  }
   
   // Build query string from query parameters (excluding 'path')
   const queryParams = new URLSearchParams()
@@ -36,6 +47,16 @@ export default async function handler(
   
   // Construct the full URL
   const url = `${API_BASE_URL}/${apiPath}${queryString ? `?${queryString}` : ''}`
+  
+  // Debug logging (will appear in Vercel function logs)
+  console.log('Proxy request:', {
+    method: req.method,
+    originalUrl: req.url,
+    pathArray,
+    apiPath,
+    url,
+    query: req.query
+  })
   
   try {
     // Prepare headers
@@ -85,12 +106,23 @@ export default async function handler(
       res.send(data)
     }
   } catch (error: any) {
-    console.error('Proxy error:', error)
+    console.error('Proxy error:', {
+      error: error.message,
+      stack: error.stack,
+      url,
+      method: req.method,
+      path: apiPath
+    })
     res.setHeader('Access-Control-Allow-Origin', '*')
     res.status(500).json({ 
       error: 'Proxy error', 
       message: error.message,
-      url 
+      url,
+      debug: {
+        apiPath,
+        pathArray: req.query.path,
+        originalUrl: req.url
+      }
     })
   }
 }
