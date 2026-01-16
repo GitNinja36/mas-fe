@@ -1,0 +1,6 @@
+export { HeroSection } from './HeroSection'
+export { MarqueeSection } from './MarqueeSection'
+export { BentoFeatures } from './BentoFeatures'
+export { PipelineSection } from './PipelineSection'
+export { DeveloperSection } from './DeveloperSection'
+export { CTASection } from './CTASection'
