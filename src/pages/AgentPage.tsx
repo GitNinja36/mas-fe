@@ -209,7 +209,9 @@ export default function AgentPage() {
                       loading || 
                       questions.every((q) => !q.question.trim()) ||
                       questions.some((q) => !q.cohortQuery?.trim()) ||
-                      questions.some((q) => q.cohortCount === null || q.cohortCount === undefined) ||
+                      // Disable if any question with cohortQuery doesn't have a cohortCount yet
+                      questions.some((q) => q.cohortQuery?.trim() && (q.cohortCount === null || q.cohortCount === undefined)) ||
+                      // Disable while any question is checking cohort count
                       questions.some((q) => q.isCheckingCohort === true)
                     }
                     className="group relative bg-[#FF3B00] px-10 py-4 rounded-xl font-bold text-sm uppercase tracking-wider transition-all duration-500 text-black hover:bg-white hover:shadow-xl hover:shadow-[#FF3B00]/30 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-3 whitespace-nowrap overflow-hidden"

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { Plus, Trash2, Sparkles, X, RotateCw } from 'lucide-react'
 import type { SurveyQuestion, AgentMode } from '../../types'
 import { AgentModeSelector } from './AgentModeSelector'
@@ -43,16 +43,16 @@ export function QuestionEditor({
   const cohortCount = currentQuestion?.cohortCount ?? null
   const isLoadingCohort = currentQuestion?.isCheckingCohort ?? false
   const [cohortError, setCohortError] = useState<string | null>(null)
-  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
 
-  const fetchCohortCount = async (query: string) => {
-    if (!query.trim() || disabled) return
+  const handleCohortQuery = async () => {
+    const query = currentQuestion?.cohortQuery?.trim()
+    if (!query || disabled) return
 
     onQuestionChange(activeQuestionIndex, 'isCheckingCohort', true)
     setCohortError(null)
     
     try {
-      const response = await queryCohort({ message: query.trim() })
+      const response = await queryCohort({ message: query })
       onQuestionChange(activeQuestionIndex, 'cohortCount', response.user_count)
     } catch (error) {
       setCohortError(error instanceof Error ? error.message : 'Failed to fetch cohort count')
@@ -61,39 +61,6 @@ export function QuestionEditor({
       onQuestionChange(activeQuestionIndex, 'isCheckingCohort', false)
     }
   }
-
-  const handleCohortQuery = async () => {
-    const query = currentQuestion?.cohortQuery?.trim()
-    if (!query || disabled) return
-    await fetchCohortCount(query)
-  }
-
-  // Auto-fetch when cohort query changes (debounced)
-  useEffect(() => {
-    const query = currentQuestion?.cohortQuery?.trim()
-    
-    // Clear previous timer
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current)
-    }
-
-    // Only auto-fetch if query exists and is different from last checked
-    if (query && query.length > 0) {
-      debounceTimerRef.current = setTimeout(() => {
-        fetchCohortCount(query)
-      }, 1000) // 1 second debounce
-    } else {
-      // Reset count if query is empty
-      onQuestionChange(activeQuestionIndex, 'cohortCount', null)
-    }
-
-    return () => {
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current)
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentQuestion?.cohortQuery, activeQuestionIndex])
 
   return (
     <div className="space-y-6">
@@ -172,7 +139,7 @@ export function QuestionEditor({
             type="text"
             value={currentQuestion?.cohortQuery || ''}
             onChange={(e) => {
-              if (!disabled && !isLoadingCohort) {
+              if (!disabled) {
                 onQuestionChange(activeQuestionIndex, 'cohortQuery', e.target.value)
                 onQuestionChange(activeQuestionIndex, 'cohortCount', null)
                 setCohortError(null)
