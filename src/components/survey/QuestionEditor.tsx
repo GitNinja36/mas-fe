@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Plus, Trash2, Sparkles, X, RotateCw } from 'lucide-react'
 import type { SurveyQuestion, AgentMode } from '../../types'
 import { AgentModeSelector } from './AgentModeSelector'
@@ -7,7 +7,7 @@ import { queryCohort } from '../../lib/api'
 interface QuestionEditorProps {
   questions: SurveyQuestion[]
   activeQuestionIndex: number
-  onQuestionChange: (index: number, field: 'question' | 'options' | 'agentMode' | 'cohortQuery' | 'cohortCount' | 'isCheckingCohort', value: string | string[] | AgentMode | number | null | boolean) => void
+  onQuestionChange: (index: number, field: 'question' | 'options' | 'agentMode' | 'cohortQuery' | 'cohortCount' | 'isCheckingCohort' | 'selectedUserCount', value: string | string[] | AgentMode | number | null | boolean) => void
   onOptionChange: (questionIndex: number, optionIndex: number, value: string) => void
   onAddQuestion: () => void
   onRemoveQuestion: (index: number) => void
@@ -42,17 +42,19 @@ export function QuestionEditor({
   
   const cohortCount = currentQuestion?.cohortCount ?? null
   const isLoadingCohort = currentQuestion?.isCheckingCohort ?? false
+  const selectedUserCount = currentQuestion?.selectedUserCount ?? cohortCount ?? 0
   const [cohortError, setCohortError] = useState<string | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const sliderRef = useRef<HTMLDivElement>(null)
 
-  const handleCohortQuery = async () => {
-    const query = currentQuestion?.cohortQuery?.trim()
-    if (!query || disabled) return
+  const fetchCohortCount = async (query: string) => {
+    if (!query.trim() || disabled) return
 
     onQuestionChange(activeQuestionIndex, 'isCheckingCohort', true)
     setCohortError(null)
     
     try {
-      const response = await queryCohort({ message: query })
+      const response = await queryCohort({ message: query.trim() })
       onQuestionChange(activeQuestionIndex, 'cohortCount', response.user_count)
     } catch (error) {
       setCohortError(error instanceof Error ? error.message : 'Failed to fetch cohort count')
@@ -61,6 +63,60 @@ export function QuestionEditor({
       onQuestionChange(activeQuestionIndex, 'isCheckingCohort', false)
     }
   }
+
+  const handleCohortQuery = async () => {
+    const query = currentQuestion?.cohortQuery?.trim()
+    if (!query || disabled) return
+    await fetchCohortCount(query)
+  }
+
+  // Initialize selectedUserCount when cohortCount is set
+  useEffect(() => {
+    if (cohortCount !== null && (currentQuestion?.selectedUserCount === undefined || currentQuestion?.selectedUserCount === null)) {
+      onQuestionChange(activeQuestionIndex, 'selectedUserCount', cohortCount)
+    }
+  }, [cohortCount, activeQuestionIndex, currentQuestion?.selectedUserCount, onQuestionChange])
+
+  const handleSliderChange = (value: number) => {
+    if (disabled || isLoadingCohort || cohortCount === null) return
+    const clampedValue = Math.max(0, Math.min(value, cohortCount))
+    onQuestionChange(activeQuestionIndex, 'selectedUserCount', clampedValue)
+  }
+
+  const handleSliderMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (disabled || isLoadingCohort || cohortCount === null) return
+    setIsDragging(true)
+    updateSliderValue(e)
+  }
+
+  const handleSliderMouseMove = (e: MouseEvent) => {
+    if (!isDragging || disabled || isLoadingCohort || cohortCount === null) return
+    updateSliderValue(e)
+  }
+
+  const handleSliderMouseUp = () => {
+    setIsDragging(false)
+  }
+
+  const updateSliderValue = (e: MouseEvent | React.MouseEvent<HTMLDivElement>) => {
+    if (!sliderRef.current || cohortCount === null) return
+    const rect = sliderRef.current.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const percentage = Math.max(0, Math.min(1, x / rect.width))
+    const value = Math.round(percentage * cohortCount)
+    handleSliderChange(value)
+  }
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleSliderMouseMove)
+      document.addEventListener('mouseup', handleSliderMouseUp)
+      return () => {
+        document.removeEventListener('mousemove', handleSliderMouseMove)
+        document.removeEventListener('mouseup', handleSliderMouseUp)
+      }
+    }
+  }, [isDragging])
 
   return (
     <div className="space-y-6">
@@ -139,7 +195,7 @@ export function QuestionEditor({
             type="text"
             value={currentQuestion?.cohortQuery || ''}
             onChange={(e) => {
-              if (!disabled) {
+              if (!disabled && !isLoadingCohort) {
                 onQuestionChange(activeQuestionIndex, 'cohortQuery', e.target.value)
                 onQuestionChange(activeQuestionIndex, 'cohortCount', null)
                 setCohortError(null)
@@ -162,8 +218,8 @@ export function QuestionEditor({
             </div>
           )}
           {(currentQuestion?.cohortQuery || isLoadingCohort) && !cohortError && (
-            <div className="flex items-center justify-between gap-2 text-xs text-[#FF3B00] font-mono">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between gap-4 text-xs text-[#FF3B00] font-mono">
+              <div className="flex items-center gap-3 flex-1">
                 {isLoadingCohort ? (
                   <span className="flex items-center gap-1">
                     Loading
@@ -174,7 +230,44 @@ export function QuestionEditor({
                     </span>
                   </span>
                 ) : cohortCount !== null ? (
-                  <span>Targeting : {cohortCount} users</span>
+                  <>
+                    <span className="whitespace-nowrap">Targeting : {cohortCount} users</span>
+                    {cohortCount > 0 && (
+                      <div className="flex items-center gap-3 flex-1 max-w-xs ml-auto">
+                        <div
+                          ref={sliderRef}
+                          onMouseDown={handleSliderMouseDown}
+                          className="relative w-full h-2.5 bg-white/5 rounded-full cursor-pointer group border border-white/10"
+                        >
+                          {/* Track fill with gradient */}
+                          <div
+                            className="absolute h-full bg-gradient-to-r from-[#FF3B00] to-[#FF6B3D] rounded-full transition-all duration-300 ease-out shadow-[0_0_8px_rgba(255,59,0,0.3)]"
+                            style={{ width: `${cohortCount > 0 ? (selectedUserCount / cohortCount) * 100 : 0}%` }}
+                          />
+                          {/* Slider thumb */}
+                          <div
+                            className={`absolute w-4 h-4 bg-[#FF3B00] rounded-full -translate-y-1/2 top-1/2 shadow-lg shadow-[#FF3B00]/50 transition-all duration-300 ease-out cursor-grab active:cursor-grabbing border-2 border-white/20 ${
+                              isDragging ? 'scale-80 ring-4 ring-[#FF3B00]/30' : 'group-hover:scale-110 group-hover:ring-2 group-hover:ring-[#FF3B00]/40'
+                            }`}
+                            style={{ left: `calc(${cohortCount > 0 ? (selectedUserCount / cohortCount) * 100 : 0}% - 8px)` }}
+                          />
+                          {/* Tooltip - shows on hover or drag */}
+                          <div
+                            className={`absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-900/95 backdrop-blur-sm border border-[#FF3B00]/30 rounded-md px-2.5 py-1 text-white text-[11px] font-mono font-semibold whitespace-nowrap pointer-events-none transition-all duration-200 ${
+                              isDragging ? 'opacity-100 scale-100' : 'opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100'
+                            }`}
+                            style={{ left: `${cohortCount > 0 ? (selectedUserCount / cohortCount) * 100 : 0}%` }}
+                          >
+                            {selectedUserCount}
+                            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 -mb-1.5 w-2 h-2 bg-gray-900/95 border-r border-b border-[#FF3B00]/30 rotate-45" />
+                          </div>
+                        </div>
+                        <span className="text-[10px] text-gray-400 min-w-[3.5rem] text-right whitespace-nowrap font-medium">
+                          {selectedUserCount} selected
+                        </span>
+                      </div>
+                    )}
+                  </>
                 ) : null}
               </div>
             </div>

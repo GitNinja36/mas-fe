@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from 'react'
 import type { ReactNode } from 'react'
-import type { SurveyQuestion, MultiSurveyResult, AgentSummary, AgentMode } from '../types'
+import type { SurveyQuestion, EnhancedManagerSurveyResponse, AgentSummary, AgentMode } from '../types'
 
 interface SurveyContextType {
   // Questions state
@@ -10,10 +10,8 @@ interface SurveyContextType {
   setActiveQuestionIndex: React.Dispatch<React.SetStateAction<number>>
   
   // Results state
-  multiSurveyResult: MultiSurveyResult | null
-  setMultiSurveyResult: React.Dispatch<React.SetStateAction<MultiSurveyResult | null>>
-  activeResultIndex: number
-  setActiveResultIndex: React.Dispatch<React.SetStateAction<number>>
+  surveyResult: EnhancedManagerSurveyResponse | null
+  setSurveyResult: React.Dispatch<React.SetStateAction<EnhancedManagerSurveyResponse | null>>
   
   // Agents state
   agents: AgentSummary[]
@@ -30,7 +28,7 @@ interface SurveyContextType {
   // Helper functions
   addQuestion: () => void
   removeQuestion: (index: number) => void
-  updateQuestion: (index: number, field: 'question' | 'options' | 'agentMode' | 'cohortQuery' | 'cohortCount' | 'isCheckingCohort', value: string | string[] | AgentMode | number | null | boolean) => void
+  updateQuestion: (index: number, field: 'question' | 'options' | 'agentMode' | 'cohortQuery' | 'cohortCount' | 'isCheckingCohort' | 'selectedUserCount', value: string | string[] | AgentMode | number | null | boolean) => void
   handleOptionChange: (questionIndex: number, optionIndex: number, value: string) => void
   addOption: (questionIndex: number) => void
   removeOption: (questionIndex: number, optionIndex: number) => void
@@ -48,7 +46,8 @@ const initialQuestion: SurveyQuestion = {
   agentMode: '1x',
   cohortQuery: '',
   cohortCount: null,
-  isCheckingCohort: false
+  isCheckingCohort: false,
+  selectedUserCount: null
 }
 
 export function SurveyProvider({ children }: { children: ReactNode }) {
@@ -57,8 +56,7 @@ export function SurveyProvider({ children }: { children: ReactNode }) {
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
   
   // Results state
-  const [multiSurveyResult, setMultiSurveyResult] = useState<MultiSurveyResult | null>(null)
-  const [activeResultIndex, setActiveResultIndex] = useState(0)
+  const [surveyResult, setSurveyResult] = useState<EnhancedManagerSurveyResponse | null>(null)
   
   // Agents state
   const [agents, setAgents] = useState<AgentSummary[]>([])
@@ -77,7 +75,8 @@ export function SurveyProvider({ children }: { children: ReactNode }) {
       agentMode: '1x',
       cohortQuery: '',
       cohortCount: null,
-      isCheckingCohort: false
+      isCheckingCohort: false,
+      selectedUserCount: null
     }
     setQuestions([...questions, newQuestion])
     setActiveQuestionIndex(questions.length)
@@ -92,7 +91,7 @@ export function SurveyProvider({ children }: { children: ReactNode }) {
 
   function updateQuestion(
     index: number, 
-    field: 'question' | 'options' | 'agentMode' | 'cohortQuery' | 'cohortCount' | 'isCheckingCohort', 
+    field: 'question' | 'options' | 'agentMode' | 'cohortQuery' | 'cohortCount' | 'isCheckingCohort' | 'selectedUserCount', 
     value: string | string[] | AgentMode | number | null | boolean
   ) {
     const newQuestions = [...questions]
@@ -104,12 +103,19 @@ export function SurveyProvider({ children }: { children: ReactNode }) {
       newQuestions[index].agentMode = value as AgentMode
     } else if (field === 'cohortQuery') {
       newQuestions[index].cohortQuery = value as string
-      // Reset cohortCount when query changes
+      // Reset cohortCount and selectedUserCount when query changes
       newQuestions[index].cohortCount = null
+      newQuestions[index].selectedUserCount = null
     } else if (field === 'cohortCount') {
       newQuestions[index].cohortCount = value as number | null
+      // Initialize selectedUserCount to cohortCount when it's first set
+      if (value !== null && newQuestions[index].selectedUserCount === null) {
+        newQuestions[index].selectedUserCount = value as number
+      }
     } else if (field === 'isCheckingCohort') {
       newQuestions[index].isCheckingCohort = value as boolean
+    } else if (field === 'selectedUserCount') {
+      newQuestions[index].selectedUserCount = value as number | null
     }
     setQuestions(newQuestions)
   }
@@ -137,8 +143,7 @@ export function SurveyProvider({ children }: { children: ReactNode }) {
   function resetSurvey() {
     setQuestions([{ ...initialQuestion, id: Date.now().toString() }])
     setActiveQuestionIndex(0)
-    setMultiSurveyResult(null)
-    setActiveResultIndex(0)
+    setSurveyResult(null)
     setError(null)
     setSurveyProgress({ current: 0, total: 0 })
   }
@@ -150,10 +155,8 @@ export function SurveyProvider({ children }: { children: ReactNode }) {
         setQuestions,
         activeQuestionIndex,
         setActiveQuestionIndex,
-        multiSurveyResult,
-        setMultiSurveyResult,
-        activeResultIndex,
-        setActiveResultIndex,
+        surveyResult,
+        setSurveyResult,
         agents,
         setAgents,
         loading,

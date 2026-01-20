@@ -30,9 +30,8 @@ export default function AgentPage() {
     setError,
     surveyProgress,
     setSurveyProgress,
-    agents,
     setAgents,
-    setMultiSurveyResult,
+    setSurveyResult,
     addQuestion,
     removeQuestion,
     updateQuestion,
@@ -67,69 +66,43 @@ export default function AgentPage() {
   }
 
   async function handleMultiSurvey() {
-    const validQuestions = questions.filter(
-      (q) => q.question.trim() && q.options.filter((opt) => opt.trim()).length >= 2 && q.cohortQuery?.trim()
-    )
+    // Use the active question for the survey
+    const activeQuestion = questions[activeQuestionIndex]
 
-    if (validQuestions.length === 0) {
-      const hasIncompleteQuestions = questions.some(
-        (q) => !q.question.trim() || q.options.filter((opt) => opt.trim()).length < 2
-      )
-      const hasMissingCohort = questions.some((q) => !q.cohortQuery?.trim())
-      
-      if (hasMissingCohort) {
-        setError('Please provide a Cohort Query for all questions')
-      } else if (hasIncompleteQuestions) {
-        setError('Please add at least one complete question with 2+ options')
-      } else {
-        setError('Please add at least one complete question with 2+ options and a Cohort Query')
-      }
+    if (!activeQuestion.question.trim() || activeQuestion.options.filter((opt) => opt.trim()).length < 2) {
+      setError('Please add a complete question with at least 2 options')
+      return
+    }
+
+    if (!activeQuestion.cohortQuery?.trim()) {
+      setError('Please provide a Cohort Query for the question')
+      return
+    }
+
+    if (activeQuestion.cohortCount === null || activeQuestion.cohortCount === undefined) {
+      setError('Please click "Check" button to verify user count before starting the survey')
       return
     }
 
     try {
       setLoading(true)
       setError(null)
-      setSurveyProgress({ current: 0, total: validQuestions.length })
-      setMultiSurveyResult(null)
+      setSurveyProgress({ current: 0, total: 1 })
+      setSurveyResult(null)
 
-      const results = []
+      const result = await conductSurvey(
+        activeQuestion.question,
+        activeQuestion.options.filter((opt) => opt.trim()),
+        activeQuestion.agentMode || '1x',
+        activeQuestion.cohortQuery || '',
+        activeQuestion.selectedUserCount || null
+      )
 
-      for (let i = 0; i < validQuestions.length; i++) {
-        setSurveyProgress({ current: i, total: validQuestions.length })
-
-        const q = validQuestions[i]
-        const result = await conductSurvey(
-          q.question,
-          q.options.filter((opt) => opt.trim()),
-          q.agentMode || '1x',
-          q.cohortQuery || ''
-        )
-
-        if (result) {
-          results.push(result)
-        }
-
-        await new Promise((resolve) => setTimeout(resolve, 500))
-      }
-
-      setSurveyProgress({ current: validQuestions.length, total: validQuestions.length })
-
-      const multiResult = {
-        questions: results,
-        overall_analytics: {
-          total_questions: results.length,
-          total_responses: results.reduce((sum, r) => sum + (r.analytics?.total_responses || 0), 0),
-          agent_consistency: {},
-          cross_question_patterns: [],
-          dominant_decision_factors: results.flatMap((r) => r.analytics?.decision_factors || [])
-        }
-      }
-
-      setMultiSurveyResult(multiResult)
+      setSurveyProgress({ current: 1, total: 1 })
+      setSurveyResult(result)
       navigate('/results')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Multi-survey failed')
+      setError(err instanceof Error ? err.message : 'Survey failed')
     } finally {
       setLoading(false)
       setSurveyProgress({ current: 0, total: 0 })
@@ -208,10 +181,14 @@ export default function AgentPage() {
                     disabled={
                       loading || 
                       questions.every((q) => !q.question.trim()) ||
-                      questions.some((q) => !q.cohortQuery?.trim()) ||
-                      // Disable if any question with cohortQuery doesn't have a cohortCount yet
-                      questions.some((q) => q.cohortQuery?.trim() && (q.cohortCount === null || q.cohortCount === undefined)) ||
-                      // Disable while any question is checking cohort count
+                      questions.some((q) => {
+                        // If cohort query exists, cohort count must be set (user must have clicked check)
+                        const hasCohortQuery = q.cohortQuery?.trim()
+                        if (hasCohortQuery) {
+                          return q.cohortCount === null || q.cohortCount === undefined
+                        }
+                        return false
+                      }) ||
                       questions.some((q) => q.isCheckingCohort === true)
                     }
                     className="group relative bg-[#FF3B00] px-10 py-4 rounded-xl font-bold text-sm uppercase tracking-wider transition-all duration-500 text-black hover:bg-white hover:shadow-xl hover:shadow-[#FF3B00]/30 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-3 whitespace-nowrap overflow-hidden"
@@ -241,8 +218,10 @@ export default function AgentPage() {
                       total={surveyProgress.total}
                       showLabel={true}
                     />
-                    <p className="text-center text-sm text-gray-400 mt-2">
-                      Processing question {surveyProgress.current + 1} of {surveyProgress.total}...
+                    <p className="text-center text-sm text-gray-400 mt-2 font-mono">
+                      {surveyProgress.current === surveyProgress.total
+                        ? '✓ Survey complete!'
+                        : `Processing survey... ${Math.min(surveyProgress.current + 1, surveyProgress.total)}/${surveyProgress.total}`}
                     </p>
                   </div>
                 )}
