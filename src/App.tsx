@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { Analytics } from '@vercel/analytics/react'
 import { SurveyProvider } from './context/SurveyContext'
 import HomePage from './pages/HomePage'
 import AgentPage from './pages/AgentPage'
@@ -14,7 +13,6 @@ export default function App() {
           <Route path="/agent" element={<AgentPage />} />
           <Route path="/results" element={<ResultsPage />} />
         </Routes>
-        <Analytics />
       </SurveyProvider>
     </BrowserRouter>
   )
