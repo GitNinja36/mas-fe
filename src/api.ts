@@ -1,8 +1,7 @@
 import type { AgentSummary, AgentMode, EnhancedManagerSurveyResponse } from './types'
 
-// API base URL - defaults to ts_server, can be overridden via env var
-const TS_SERVER_BASE = import.meta.env.VITE_TS_SERVER_BASE ?? 'http://localhost:1556'
-const PYTHON_SERVER_BASE = import.meta.env.VITE_API_BASE ?? 'http://127.0.0.1:8000'
+// Single API gateway (ts-server); all requests go here in production
+const TS_SERVER_BASE = import.meta.env.VITE_TS_SERVER_BASE ?? import.meta.env.VITE_API_BASE ?? 'http://localhost:1556'
 
 // Helper to get valid auth token (refreshes if expired)
 async function getAuthToken(): Promise<string | null> {
@@ -23,8 +22,8 @@ async function getAuthHeaders(): Promise<HeadersInit> {
 
 export async function fetchAgents(): Promise<AgentSummary[]> {
   try {
-    // Agents endpoint is still on Python server
-    const response = await fetch(`${PYTHON_SERVER_BASE}/agents`)
+    // Agents go through ts-server proxy to Python backend
+    const response = await fetch(`${TS_SERVER_BASE}/agents`)
     if (!response.ok) throw new Error(`HTTP ${response.status}`)
     return await response.json()
   } catch (error) {
@@ -308,4 +307,4 @@ export async function fetchNextPolymarketQuestion(): Promise<{
   }
 }
 
-export { TS_SERVER_BASE as API_BASE, PYTHON_SERVER_BASE }
+export { TS_SERVER_BASE as API_BASE }

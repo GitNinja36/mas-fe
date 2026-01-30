@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? 'http://127.0.0.1:8000'
+// Use ts-server as single API gateway (ping is served by ts-server)
+const API_BASE = import.meta.env.VITE_TS_SERVER_BASE ?? import.meta.env.VITE_API_BASE ?? 'http://localhost:1556'
 const HEALTH_CHECK_INTERVAL = 30000 // 30 seconds
 
 export type HealthStatus = 'healthy' | 'unhealthy' | 'checking'

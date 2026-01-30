@@ -8,7 +8,8 @@ export type CohortCountResponse = {
   source: string
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? 'http://127.0.0.1:8000'
+// Use ts-server as single API gateway (proxies /imint/cohort-count to Python)
+const API_BASE = import.meta.env.VITE_TS_SERVER_BASE ?? import.meta.env.VITE_API_BASE ?? 'http://localhost:1556'
 
 export async function queryCohort(req: CohortCountRequest): Promise<CohortCountResponse> {
   try {
