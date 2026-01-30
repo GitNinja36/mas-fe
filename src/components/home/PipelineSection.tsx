@@ -12,10 +12,10 @@ function TypewriterQuestion() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [displayText, setDisplayText] = useState('')
   const [isTyping, setIsTyping] = useState(true)
-  
+
   useEffect(() => {
     const currentQuestion = questions[currentIndex]
-    
+
     if (isTyping) {
       if (displayText.length < currentQuestion.length) {
         const timeout = setTimeout(() => {
@@ -38,7 +38,7 @@ function TypewriterQuestion() {
       }
     }
   }, [displayText, isTyping, currentIndex])
-  
+
   return (
     <div className="relative">
       <div className="bg-[#0a0a0a] border border-white/10 rounded-lg p-4 min-h-[80px]">
@@ -64,17 +64,17 @@ function TemplateCards() {
   ]
   const [activeIndex, setActiveIndex] = useState(0)
   const [isAutoRotating, setIsAutoRotating] = useState(true)
-  
+
   // Auto-rotate only when not interacted with
   useEffect(() => {
     if (!isAutoRotating) return
-    
+
     const interval = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % templates.length)
     }, 3000)
     return () => clearInterval(interval)
   }, [isAutoRotating])
-  
+
   // Handle click on template
   const handleTemplateClick = (index: number) => {
     setActiveIndex(index)
@@ -82,31 +82,28 @@ function TemplateCards() {
     // Resume auto-rotation after 10 seconds of no interaction
     setTimeout(() => setIsAutoRotating(true), 10000)
   }
-  
+
   return (
     <div className="flex gap-2 mt-4">
       {templates.map((t, i) => (
         <div
           key={i}
           onClick={() => handleTemplateClick(i)}
-          className={`flex-1 p-3 rounded-lg border transition-all duration-300 cursor-pointer group ${
-            i === activeIndex 
-              ? 'border-[#FF3B00]/50 bg-[#FF3B00]/10 scale-105' 
-              : 'border-white/10 bg-white/5 opacity-60 hover:opacity-100 hover:border-[#FF3B00]/30 hover:bg-[#FF3B00]/5'
-          }`}
+          className={`flex-1 p-3 rounded-lg border transition-all duration-300 cursor-pointer group ${i === activeIndex
+            ? 'border-[#FF3B00]/50 bg-[#FF3B00]/10 scale-105'
+            : 'border-white/10 bg-white/5 opacity-60 hover:opacity-100 hover:border-[#FF3B00]/30 hover:bg-[#FF3B00]/5'
+            }`}
         >
-          <div className={`text-[10px] font-mono mb-1 transition-colors duration-300 ${
-            i === activeIndex 
-              ? 'text-[#FF3B00]' 
-              : 'text-gray-500 group-hover:text-[#FF3B00]'
-          }`}>
+          <div className={`text-[10px] font-mono mb-1 transition-colors duration-300 ${i === activeIndex
+            ? 'text-[#FF3B00]'
+            : 'text-gray-500 group-hover:text-[#FF3B00]'
+            }`}>
             {t.tag}
           </div>
-          <div className={`text-xs line-clamp-2 transition-colors duration-300 ${
-            i === activeIndex 
-              ? 'text-gray-300' 
-              : 'text-gray-400 group-hover:text-gray-300'
-          }`}>
+          <div className={`text-xs line-clamp-2 transition-colors duration-300 ${i === activeIndex
+            ? 'text-gray-300'
+            : 'text-gray-400 group-hover:text-gray-300'
+            }`}>
             {t.q}
           </div>
         </div>
@@ -127,10 +124,10 @@ function CohortQueryPreview() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [displayText, setDisplayText] = useState('')
   const [isTyping, setIsTyping] = useState(true)
-  
+
   useEffect(() => {
     const currentCohort = cohorts[currentIndex]
-    
+
     if (isTyping) {
       if (displayText.length < currentCohort.length) {
         const timeout = setTimeout(() => {
@@ -153,11 +150,11 @@ function CohortQueryPreview() {
       }
     }
   }, [displayText, isTyping, currentIndex])
-  
+
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
-        <span className="text-sm text-white font-medium">Cohort Query</span>
+        <span className="text-sm text-white font-medium">Survey Sample Query</span>
         <span className="text-xs text-gray-500">(Optional)</span>
       </div>
       <div className="bg-[#0a0a0a] border border-white/10 rounded-lg p-3">
@@ -173,13 +170,13 @@ function CohortQueryPreview() {
 // Mock Options Preview - With hover effects
 function OptionsPreview() {
   const options = ['Option A', 'Option B', 'Option C']
-  
+
   return (
     <div className="space-y-2 mt-4">
       <div className="text-[10px] text-gray-500 font-mono">AVAILABLE OPTIONS</div>
       {options.map((opt, i) => (
-        <div 
-          key={i} 
+        <div
+          key={i}
           className="flex items-center gap-3 p-2 rounded border border-white/10 bg-white/5 cursor-pointer transition-all duration-300 group hover:border-[#FF3B00]/50 hover:bg-[#FF3B00]/5"
         >
           <div className="w-6 h-6 rounded bg-[#FF3B00]/20 border border-[#FF3B00]/50 flex items-center justify-center text-[10px] text-[#FF3B00] font-bold transition-all duration-300 group-hover:bg-[#FF3B00]/30 group-hover:border-[#FF3B00]">
@@ -211,22 +208,22 @@ export function PipelineSection() {
                   <span className="text-[10px] text-green-400 font-mono">ACTIVE</span>
                 </div>
               </div>
-              
+
               {/* Typewriter Input */}
               <div className="mb-4">
                 <div className="text-xs text-gray-500 font-mono mb-2">YOUR QUESTION</div>
                 <TypewriterQuestion />
               </div>
-              
+
               {/* Template Cards */}
               <div className="mb-4">
-                <div className="text-xs text-gray-500 font-mono mb-2">QUICK TEMPLATES</div>
+                <div className="text-xs text-gray-500 font-mono mb-2">SAMPLE QUESTIONS</div>
                 <TemplateCards />
               </div>
-              
+
               {/* Options Preview */}
               <OptionsPreview />
-              
+
               {/* Cohort Query */}
               <div className="mt-4 pt-4 border-t border-white/5">
                 <CohortQueryPreview />
@@ -243,38 +240,30 @@ export function PipelineSection() {
               Ask Once and Survey At Scale
             </h2>
             <p className="text-lg mb-8 leading-relaxed text-gray-400">
-            Ask one sharp question. Define AI twin cohort. Get decision ready insights in minutes.
+              Ask one sharp question. Define AI twin cohort. Get decision ready insights in minutes.
             </p>
 
             {/* Step 1 */}
             <div className="step-item mb-48 pt-10 opacity-35 transition-opacity duration-500">
               <h3 className="text-4xl font-display font-bold mb-4 text-white">Step 1: Ask Questions</h3>
               <p className="text-xl leading-relaxed font-medium text-white/90">
-              Turn your idea into set of questions ranging from product/feature validation to even trending predictions.
+                Turn your ideas into a set of questions ranging from product/feature validation to finding the pulse on trends.
               </p>
             </div>
 
             {/* Step 2 */}
             <div className="step-item mb-48 opacity-35 transition-opacity duration-500">
-              <h3 className="text-4xl font-display font-bold mb-4 text-white">Step 2: Shape the choices</h3>
+              <h3 className="text-4xl font-display font-bold mb-4 text-white">Step 2: Shape the Choices</h3>
               <p className="text-xl leading-relaxed font-medium text-white/90">
-              Add the options you want to test. Survey Intelligence turns them into clean A/B/C comparisons for each AI twin.
+                Enter the options you want your respondents to have. Banza turns them into clear cut A/B/C comparisons for each AI Twin.
               </p>
             </div>
 
             {/* Step 3 */}
             <div className="step-item mb-48 opacity-35 transition-opacity duration-500">
-              <h3 className="text-4xl font-display font-bold mb-4 text-white">Step 3: Target the cohort</h3>
+              <h3 className="text-4xl font-display font-bold mb-4 text-white">Step 3: Define the Survey Sample</h3>
               <p className="text-xl leading-relaxed font-medium text-white/90">
-              Define your cohort like "Gamers in New York" or "GenZ in India" and instantly route the question to the right AI Twins.
-              </p>
-            </div>
-
-            {/* Step 4 */}
-            <div className="step-item mb-48 opacity-35 transition-opacity duration-500">
-              <h3 className="text-4xl font-display font-bold mb-4 text-white">Step 4: Define sampling depth</h3>
-              <p className="text-xl leading-relaxed font-medium text-white/90">
-              Define participating number of AI twins and survey depth to get higher accuracy & confidence score.
+                Define your survey sample like "Gamers in New York" or "GenZ in India" and instantly route the question to the right AI Twins. Choose how many AI Twins participate to balance speed, accuracy, and depth.
               </p>
             </div>
 
@@ -282,7 +271,7 @@ export function PipelineSection() {
             <div className="step-item opacity-35 transition-opacity duration-500">
               <h3 className="text-4xl font-display font-bold mb-4 text-white">Step 5: Get the report</h3>
               <p className="text-xl leading-relaxed font-medium text-white/90">
-              Receive downloadable survey report with detailed analysis and clear action items.
+                Receive downloadable survey report with detailed analysis and clear action items.
               </p>
             </div>
 

@@ -1,0 +1,112 @@
+/* Custom Toastify Styles - Dark Theme with Orange Accents */
+.custom-toast-container {
+  font-family: 'Inter', 'JetBrains Mono', monospace;
+}
+
+.custom-toast-container .Toastify__toast {
+  background: rgba(10, 10, 10, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: #e0e0e0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 59, 0, 0.1);
+  padding: 16px;
+  min-height: 64px;
+}
+
+.custom-toast-container .Toastify__toast--success {
+  border-left: 4px solid #10b981;
+  background: rgba(10, 10, 10, 0.95);
+}
+
+.custom-toast-container .Toastify__toast--error {
+  border-left: 4px solid #ef4444;
+  background: rgba(10, 10, 10, 0.95);
+}
+
+.custom-toast-container .Toastify__toast--warning {
+  border-left: 4px solid #f59e0b;
+  background: rgba(10, 10, 10, 0.95);
+}
+
+.custom-toast-container .Toastify__toast--info {
+  border-left: 4px solid #FF3B00;
+  background: rgba(10, 10, 10, 0.95);
+}
+
+.custom-toast-container .Toastify__toast-body {
+  color: #e0e0e0;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 0;
+  margin: 0;
+  font-weight: 400;
+}
+
+.custom-toast-container .Toastify__progress-bar {
+  background: linear-gradient(90deg, #FF3B00, #FF6B3D);
+  height: 3px;
+}
+
+.custom-toast-container .Toastify__progress-bar--success {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.custom-toast-container .Toastify__progress-bar--error {
+  background: linear-gradient(90deg, #ef4444, #f87171);
+}
+
+.custom-toast-container .Toastify__progress-bar--warning {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+.custom-toast-container .Toastify__progress-bar--info {
+  background: linear-gradient(90deg, #FF3B00, #FF6B3D);
+}
+
+.custom-toast-container .Toastify__close-button {
+  color: #9ca3af;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+}
+
+.custom-toast-container .Toastify__close-button:hover {
+  color: #FF3B00;
+  opacity: 1;
+}
+
+.custom-toast-container .Toastify__toast-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Animation adjustments */
+.custom-toast-container .Toastify__slide-enter--top-right {
+  animation: toastSlideInRight 0.3s ease-out;
+}
+
+.custom-toast-container .Toastify__slide-exit--top-right {
+  animation: toastSlideOutRight 0.2s ease-in;
+}
+
+@keyframes toastSlideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toastSlideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}

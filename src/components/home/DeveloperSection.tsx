@@ -124,13 +124,13 @@ export function DeveloperSection() {
         {/* Left: Content */}
         <div>
           <span className="text-[#FF3B00] font-mono text-xs tracking-widest block mb-4">
-            /// AGENT EXPERIENCE
+            /// FINE-TUNING BANZA'S SURVEY AGENT
           </span>
           <h2 className="font-display font-bold text-4xl md:text-5xl mb-6 text-white">
             Built for Precision Sampling
           </h2>
           <p className="text-lg mb-8 leading-relaxed text-gray-400">
-            No more guess work. Try different modes to pick how many AI twins to sample per question, balancing speed, confidence, accuracy with depth in a click.
+            No more guess work. Tune our Survey Agent to suit your exact needs. Try different modes to pick how many AI twins answer each question, balancing speed, confidence, accuracy with depth in a click.
           </p>
 
           {/* Agent Modes */}

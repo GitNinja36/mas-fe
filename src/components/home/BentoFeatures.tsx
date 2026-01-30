@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import Lottie from 'lottie-react'
-import { PlatformNetworkParticles } from './PlatformNetworkParticles'
 import loadingAnimation from '../../assets/loading.json'
 
 // Pulsing Lock Icon with Glow Effect
@@ -112,65 +111,6 @@ function TypewriterText() {
   )
 }
 
-// Animated Progress Bar for 5x Aperture
-function AnimatedProgress() {
-  const [progress, setProgress] = useState(0)
-  const [count, setCount] = useState(0)
-  
-  useEffect(() => {
-    let animationId: number
-    
-    const runAnimation = () => {
-      const duration = 4000  // Slower animation
-      const pauseDuration = 3000  // 3 sec pause before restart
-      const targetProgress = 82
-      const targetCount = 12
-      const startTime = performance.now()
-      
-      const animate = (currentTime: number) => {
-        const elapsed = currentTime - startTime
-        const p = Math.min(elapsed / duration, 1)
-        const eased = 1 - Math.pow(1 - p, 4) // smoother ease-out
-        
-        setProgress(eased * targetProgress)
-        setCount(Math.floor(eased * targetCount))
-        
-        if (p < 1) {
-          animationId = requestAnimationFrame(animate)
-        } else {
-          // Pause then restart
-          setTimeout(() => {
-            setProgress(0)
-            setCount(0)
-            setTimeout(runAnimation, 500)
-          }, pauseDuration)
-        }
-      }
-      
-      animationId = requestAnimationFrame(animate)
-    }
-    
-    runAnimation()
-    
-    return () => cancelAnimationFrame(animationId)
-  }, [])
-  
-  return (
-    <div className="flex flex-col gap-1.5 w-40">
-      <div className="flex justify-between text-[8px] text-gray-500 font-mono mb-1 mt-8">
-        <span>PLATFORMS</span>
-        <span>{count}/16 ACTIVE</span>
-      </div>
-      <div className="w-full h-1.5 rounded-full overflow-hidden bg-white/10">
-        <div
-          className="h-full bg-gradient-to-r from-[#FF3B00] to-yellow-500 rounded-full"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-    </div>
-  )
-}
-
 function AnimatedCounter({ target }: { target: number }) {
   const [count, setCount] = useState(0)
   
@@ -257,7 +197,7 @@ export function BentoFeatures() {
           <div className="text-right mt-4 md:mt-0">
             <div className="flex items-center justify-end gap-2 mb-1">
               <span className="w-2 h-2 bg-green-500 rounded-full animate-blink" />
-              <span className="font-mono text-xs text-white">AGENTS: ACTIVE</span>
+              <span className="font-mono text-xs text-white">AGENTS: ACTIVE 24/7</span>
             </div>
             <p className="text-gray-500 font-mono text-xs uppercase tracking-widest">
               AI Twins Online: +100k
@@ -266,7 +206,7 @@ export function BentoFeatures() {
         </div>
 
         {/* Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-3 gap-6 h-auto md:h-[900px]">
+        <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-6 h-auto md:h-[600px]">
           {/* AI Twin Engine - Large Card */}
           <div className="md:col-span-2 md:row-span-2 glass-panel spotlight-card rounded-xl overflow-hidden relative group">
             <div className="scan-line" />
@@ -289,7 +229,7 @@ export function BentoFeatures() {
               </div>
               <h3 className="font-display font-bold text-2xl mb-2 text-white">AI Twin Synthesis</h3>
               <p className="text-sm max-w-sm text-gray-300">
-              Individual AI twin personas fetching on-demand data streams from users across self-attested data from 20+ apps, personal interactions, opinions and behavioral signals.
+              Individual AI twin personas fetching on-demand data streams from users across verified self-attested data from 20+ apps, personal interactions, opinions and behavioral signals.
               </p>
             </div>
           </div>
@@ -357,17 +297,17 @@ export function BentoFeatures() {
             </div>
           </div>
 
-          {/* Multi-Platform Aperture */}
-          <div className="md:col-span-2 md:row-span-1 glass-panel spotlight-card rounded-xl p-8 flex items-center justify-between">
+          {/* Multi-Platform Aperture - Commented out */}
+          {/* <div className="md:col-span-2 md:row-span-1 glass-panel spotlight-card rounded-xl p-8 flex items-center justify-between">
             <div>
               <h3 className="font-display font-bold text-xl mb-2 text-white">5x Aperture Mode</h3>
               <p className="text-xs font-mono text-gray-300">Cross-Platform Intelligence Layer</p>
             </div>
             <AnimatedProgress />
-          </div>
+          </div> */}
 
-          {/* Platform Network */}
-          <div className="md:col-span-2 md:row-span-1 glass-panel spotlight-card rounded-xl p-6 relative overflow-hidden">
+          {/* Platform Network - Commented out */}
+          {/* <div className="md:col-span-2 md:row-span-1 glass-panel spotlight-card rounded-xl p-6 relative overflow-hidden">
             <div className="absolute inset-0 dot-grid opacity-30" />
             <div className="flex justify-between items-center mb-2 z-20 relative">
               <span className="font-display font-bold text-lg text-white">Platform Network</span>
@@ -376,7 +316,7 @@ export function BentoFeatures() {
             <div className="md:col-span-2 md:row-span-1 glass-panel spotlight-card rounded-xl p-6 relative overflow-hidden w-full h-50 mt-4 z-10">
               <PlatformNetworkParticles />
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>

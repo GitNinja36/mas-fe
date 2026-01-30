@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from 'react'
 import type { ReactNode } from 'react'
-import type { SurveyQuestion, EnhancedManagerSurveyResponse, AgentSummary, AgentMode } from '../types'
+import type { SurveyQuestion, EnhancedManagerSurveyResponse, AgentSummary, AgentMode, PolymarketData } from '../types'
 
 interface SurveyContextType {
   // Questions state
@@ -8,15 +8,15 @@ interface SurveyContextType {
   setQuestions: React.Dispatch<React.SetStateAction<SurveyQuestion[]>>
   activeQuestionIndex: number
   setActiveQuestionIndex: React.Dispatch<React.SetStateAction<number>>
-  
+
   // Results state
   surveyResult: EnhancedManagerSurveyResponse | null
   setSurveyResult: React.Dispatch<React.SetStateAction<EnhancedManagerSurveyResponse | null>>
-  
+
   // Agents state
   agents: AgentSummary[]
   setAgents: React.Dispatch<React.SetStateAction<AgentSummary[]>>
-  
+
   // Loading and error states
   loading: boolean
   setLoading: React.Dispatch<React.SetStateAction<boolean>>
@@ -24,11 +24,11 @@ interface SurveyContextType {
   setError: React.Dispatch<React.SetStateAction<string | null>>
   surveyProgress: { current: number; total: number }
   setSurveyProgress: React.Dispatch<React.SetStateAction<{ current: number; total: number }>>
-  
+
   // Helper functions
   addQuestion: () => void
   removeQuestion: (index: number) => void
-  updateQuestion: (index: number, field: 'question' | 'options' | 'agentMode' | 'cohortQuery' | 'cohortCount' | 'isCheckingCohort' | 'selectedUserCount', value: string | string[] | AgentMode | number | null | boolean) => void
+  updateQuestion: (index: number, field: 'question' | 'options' | 'agentMode' | 'cohortQuery' | 'cohortCount' | 'isCheckingCohort' | 'selectedUserCount' | 'isPolymarket' | 'marketId' | 'polymarketData', value: string | string[] | AgentMode | number | null | boolean | PolymarketData | undefined) => void
   handleOptionChange: (questionIndex: number, optionIndex: number, value: string) => void
   addOption: (questionIndex: number) => void
   removeOption: (questionIndex: number, optionIndex: number) => void
@@ -47,20 +47,23 @@ const initialQuestion: SurveyQuestion = {
   cohortQuery: '',
   cohortCount: null,
   isCheckingCohort: false,
-  selectedUserCount: null
+  selectedUserCount: null,
+  isPolymarket: false,
+  marketId: undefined,
+  polymarketData: undefined
 }
 
 export function SurveyProvider({ children }: { children: ReactNode }) {
   // Questions state
   const [questions, setQuestions] = useState<SurveyQuestion[]>([{ ...initialQuestion }])
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
-  
+
   // Results state
   const [surveyResult, setSurveyResult] = useState<EnhancedManagerSurveyResponse | null>(null)
-  
+
   // Agents state
   const [agents, setAgents] = useState<AgentSummary[]>([])
-  
+
   // Loading and error states
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -76,7 +79,9 @@ export function SurveyProvider({ children }: { children: ReactNode }) {
       cohortQuery: '',
       cohortCount: null,
       isCheckingCohort: false,
-      selectedUserCount: null
+      selectedUserCount: null,
+      isPolymarket: false,
+      polymarketData: undefined
     }
     setQuestions([...questions, newQuestion])
     setActiveQuestionIndex(questions.length)
@@ -90,34 +95,47 @@ export function SurveyProvider({ children }: { children: ReactNode }) {
   }
 
   function updateQuestion(
-    index: number, 
-    field: 'question' | 'options' | 'agentMode' | 'cohortQuery' | 'cohortCount' | 'isCheckingCohort' | 'selectedUserCount', 
-    value: string | string[] | AgentMode | number | null | boolean
+    index: number,
+    field: 'question' | 'options' | 'agentMode' | 'cohortQuery' | 'cohortCount' | 'isCheckingCohort' | 'selectedUserCount' | 'isPolymarket' | 'marketId' | 'polymarketData',
+    value: string | string[] | AgentMode | number | null | boolean | PolymarketData | undefined
   ) {
-    const newQuestions = [...questions]
-    if (field === 'question') {
-      newQuestions[index].question = value as string
-    } else if (field === 'options') {
-      newQuestions[index].options = value as string[]
-    } else if (field === 'agentMode') {
-      newQuestions[index].agentMode = value as AgentMode
-    } else if (field === 'cohortQuery') {
-      newQuestions[index].cohortQuery = value as string
-      // Reset cohortCount and selectedUserCount when query changes
-      newQuestions[index].cohortCount = null
-      newQuestions[index].selectedUserCount = null
-    } else if (field === 'cohortCount') {
-      newQuestions[index].cohortCount = value as number | null
-      // Initialize selectedUserCount to cohortCount when it's first set
-      if (value !== null && newQuestions[index].selectedUserCount === null) {
-        newQuestions[index].selectedUserCount = value as number
+    setQuestions((prevQuestions) => {
+      const newQuestions = [...prevQuestions]
+      // Create a shallow copy of the question being updated to avoid mutation
+      const updatedQuestion = { ...newQuestions[index] }
+
+      if (field === 'question') {
+        updatedQuestion.question = value as string
+      } else if (field === 'options') {
+        updatedQuestion.options = value as string[]
+      } else if (field === 'agentMode') {
+        updatedQuestion.agentMode = value as AgentMode
+      } else if (field === 'cohortQuery') {
+        updatedQuestion.cohortQuery = value as string
+        // Reset cohortCount and selectedUserCount when query changes
+        updatedQuestion.cohortCount = null
+        updatedQuestion.selectedUserCount = null
+      } else if (field === 'cohortCount') {
+        updatedQuestion.cohortCount = value as number | null
+        // Initialize selectedUserCount to cohortCount when it's first set
+        if (value !== null && updatedQuestion.selectedUserCount === null) {
+          updatedQuestion.selectedUserCount = value as number
+        }
+      } else if (field === 'isCheckingCohort') {
+        updatedQuestion.isCheckingCohort = value as boolean
+      } else if (field === 'selectedUserCount') {
+        updatedQuestion.selectedUserCount = value as number | null
+      } else if (field === 'isPolymarket') {
+        updatedQuestion.isPolymarket = value as boolean
+      } else if (field === 'marketId') {
+        updatedQuestion.marketId = value as string
+      } else if (field === 'polymarketData') {
+        updatedQuestion.polymarketData = value as PolymarketData | undefined
       }
-    } else if (field === 'isCheckingCohort') {
-      newQuestions[index].isCheckingCohort = value as boolean
-    } else if (field === 'selectedUserCount') {
-      newQuestions[index].selectedUserCount = value as number | null
-    }
-    setQuestions(newQuestions)
+
+      newQuestions[index] = updatedQuestion
+      return newQuestions
+    })
   }
 
   function handleOptionChange(questionIndex: number, optionIndex: number, value: string) {

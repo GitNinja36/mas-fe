@@ -7,6 +7,7 @@ import {
   BentoFeatures,
   PipelineSection,
   DeveloperSection,
+  PricingSection,
   CTASection
 } from '../components/home'
 
@@ -70,9 +71,10 @@ export default function HomePage() {
 
         {/* Rest of the sections without spotlight */}
         <div className="bg-[#050505]">
-          <BentoFeatures />
-          <PipelineSection />
+          <div id="core"><BentoFeatures /></div>
+          <div id="how-it-works"><PipelineSection /></div>
           <DeveloperSection />
+          <div id="pricing"><PricingSection /></div>
           <CTASection />
         </div>
       </main>

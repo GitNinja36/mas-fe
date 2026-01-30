@@ -2,8 +2,7 @@ import { useMemo } from 'react'
 import type { EnhancedManagerSurveyResponse } from '../../../types'
 import { JobCard } from '../cards/JobCard'
 import { calculateJobsToBeDone } from '../utils/jobsToBeDoneCalculator'
-import { formatPercentage } from '../utils/formatters'
-import { Briefcase } from 'lucide-react'
+import { Briefcase, Target, Compass, ArrowRight } from 'lucide-react'
 
 interface JobsToBeDoneTabProps {
   result: EnhancedManagerSurveyResponse
@@ -24,120 +23,92 @@ export function JobsToBeDoneTab({ result }: JobsToBeDoneTabProps) {
     })
   }, [result])
 
+  const situation = jobsAnalysis?.canvas_data || {
+    situation: "Agents navigating complex trade-offs in current market conditions",
+    job: "Find optimal balance between performance and cost",
+    outcome: "Maximize ROI without compromising core stability"
+  };
+
   if (!jobsAnalysis || jobsAnalysis.jobs.length === 0) {
     return (
-      <div className="bg-[#080808] rounded-2xl border border-white/10 p-6">
-        <p className="text-sm text-gray-400">No jobs to be done data available</p>
+      <div className="bg-[#080808] rounded-2xl border border-white/10 p-12 text-center">
+        <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Briefcase className="w-8 h-8 text-gray-600" />
+        </div>
+        <p className="text-gray-400 font-mono">No sufficient data for Jobs analysis.</p>
       </div>
     )
   }
 
-  const primaryJob = jobsAnalysis.jobs[0]
-
   return (
-    <div className="space-y-6">
-      {/* Introduction */}
-      <div className="bg-[#080808] rounded-xl border border-white/10 p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-lg bg-[#FF3B00]/10 border border-[#FF3B00]/30 flex items-center justify-center">
-            <Briefcase className="w-5 h-5 text-[#FF3B00]" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-white">What Are Users Trying to Accomplish?</h3>
-            <p className="text-xs font-mono text-gray-500 uppercase tracking-wider mt-1">
-              Jobs to Be Done Analysis
-            </p>
+    <div className="space-y-12 animate-fade-in-up">
+
+      {/* 1. Hero / Context Canvas */}
+      <div className="relative">
+        <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#FF3B00] to-purple-600 rounded-full" />
+        <div className="pl-6 md:pl-8">
+          <h2 className="text-2xl font-bold text-white font-display mb-2">The Customer Job Context</h2>
+          <p className="text-gray-400 max-w-2xl text-sm leading-relaxed mb-8">
+            Understanding the "Struggle" — users don't buy products, they "hire" them to make progress in a specific situation.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Situation */}
+            <div className="bg-[#0A0A0A] p-5 rounded-xl border border-white/10 relative group hover:border-white/20 transition-colors">
+              <div className="text-[10px] font-bold uppercase text-gray-500 mb-2 flex items-center gap-2">
+                <Compass size={12} className="text-blue-500" /> Current Situation
+              </div>
+              <div className="text-sm font-medium text-gray-200 leading-snug">
+                {situation.situation}
+              </div>
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 -mr-3 z-10 hidden md:block text-gray-700">
+                <ArrowRight size={14} />
+              </div>
+            </div>
+
+            {/* The Job (Struggle) */}
+            <div className="bg-[#0A0A0A] p-5 rounded-xl border border-white/10 border-l-2 border-l-[#FF3B00] relative group shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
+              <div className="text-[10px] font-bold uppercase text-[#FF3B00] mb-2 flex items-center gap-2">
+                <Briefcase size={12} /> The Core Job
+              </div>
+              <div className="text-sm font-medium text-white leading-snug">
+                {situation.job}
+              </div>
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 -mr-3 z-10 hidden md:block text-gray-700">
+                <ArrowRight size={14} />
+              </div>
+            </div>
+
+            {/* Desired Outcome */}
+            <div className="bg-[#0A0A0A] p-5 rounded-xl border border-white/10 relative group hover:border-white/20 transition-colors">
+              <div className="text-[10px] font-bold uppercase text-gray-500 mb-2 flex items-center gap-2">
+                <Target size={12} className="text-emerald-500" /> Success State
+              </div>
+              <div className="text-sm font-medium text-gray-200 leading-snug">
+                {situation.outcome}
+              </div>
+            </div>
           </div>
         </div>
-        <p className="text-sm text-gray-400 leading-relaxed">
-          Below are the deeper goals and jobs that drive user choices, extracted from their reasoning patterns.
-        </p>
       </div>
 
-      {/* Primary Job and Secondary Job Side-by-Side */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Primary Job */}
-        {jobsAnalysis.jobs.length > 0 && (
-          <JobCard job={jobsAnalysis.jobs[0]} index={0} />
-        )}
 
-        {/* Secondary Job (in place of Jobs Visualization) */}
-        {jobsAnalysis.jobs.length > 1 && (
-          <JobCard job={jobsAnalysis.jobs[1]} index={1} />
-        )}
-      </div>
+      {/* 2. Prioritized Jobs (Cards) */}
+      <div className="space-y-6">
+        <div className="flex items-center justify-between px-1">
+          <h3 className="text-sm font-bold font-mono text-gray-500 uppercase tracking-widest">
+            Detected Jobs (Prioritized)
+          </h3>
+          <span className="text-[10px] bg-white/5 border border-white/10 px-2 py-1 rounded text-gray-500">
+            {jobsAnalysis.jobs.length} Opportunities Found
+          </span>
+        </div>
 
-      {/* Secondary Section - Shows Tertiary Job */}
-      {jobsAnalysis.jobs.length > 2 && (
-        <JobCard job={jobsAnalysis.jobs[2]} index={2} />
-      )}
-
-      {/* Tertiary Section - Jobs Visualization and Design Roadmap Side-by-Side */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Jobs Visualization */}
-        {jobsAnalysis.canvas_data && (
-          <div className="bg-[#080808] rounded-xl border border-white/10 p-6 h-full flex flex-col">
-            <h3 className="text-lg font-semibold text-white mb-6">Jobs Visualization</h3>
-            <div className="flex-1 overflow-y-auto pr-2 [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.2)_transparent] hover:[scrollbar-color:rgba(255,255,255,0.3)_transparent] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/20 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-white/30">
-              <div className="grid gap-4 grid-cols-1">
-                {/* Situation Column */}
-                <div>
-                  <h4 className="text-sm font-bold text-gray-300 mb-4">Situation</h4>
-                  <div className="rounded-lg bg-blue-500/10 border border-blue-500/30 p-4">
-                    <p className="text-sm text-gray-200">{jobsAnalysis.canvas_data.situation}</p>
-                  </div>
-                </div>
-
-                {/* Job Column */}
-                <div>
-                  <h4 className="text-sm font-bold text-gray-300 mb-4">Job to Be Done</h4>
-                  <div className="rounded-lg bg-[#FF3B00]/10 border border-[#FF3B00]/30 p-4">
-                    <p className="text-sm text-gray-200">{jobsAnalysis.canvas_data.job}</p>
-                  </div>
-                </div>
-
-                {/* Outcome Column */}
-                <div>
-                  <h4 className="text-sm font-bold text-gray-300 mb-4">Desired Outcome</h4>
-                  <div className="rounded-lg bg-green-500/10 border border-green-500/30 p-4">
-                    <p className="text-sm text-gray-200">{jobsAnalysis.canvas_data.outcome}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Design Roadmap */}
-        {primaryJob && primaryJob.design_implications.length > 0 && (
-          <div className="bg-[#080808] rounded-xl border border-white/10 p-6 h-full flex flex-col">
-            <h3 className="text-lg font-semibold text-white mb-6">Design Roadmap Based on Jobs</h3>
-            <div className="flex-1 overflow-y-auto pr-2 [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.2)_transparent] hover:[scrollbar-color:rgba(255,255,255,0.3)_transparent] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/20 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-white/30">
-              <div className="space-y-6">
-                {primaryJob.design_implications.slice(0, 3).map((impl, idx) => {
-                  const priorities = ['P0', 'P1', 'P2'] as const
-                  const priority = priorities[idx] || 'P2'
-                  const adoption = idx === 0 ? primaryJob.adoption : primaryJob.adoption * (0.7 - idx * 0.2)
-
-                  return (
-                    <div
-                      key={idx}
-                      className="flex items-start gap-4 p-4 rounded-lg bg-white/5 border border-white/10"
-                    >
-                      <div className="text-2xl font-bold text-[#FF3B00] min-w-[50px]">{priority}</div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-100">{impl}</h4>
-                        <p className="text-sm text-gray-400 mt-1">
-                          Addresses {formatPercentage(adoption, 1)} of users' {idx === 0 ? 'PRIMARY' : idx === 1 ? 'SECONDARY' : 'TERTIARY'} job
-                        </p>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          </div>
-        )}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {jobsAnalysis.jobs.map((job, idx) => (
+            <JobCard key={idx} job={job} index={idx} />
+          ))}
+        </div>
       </div>
     </div>
   )

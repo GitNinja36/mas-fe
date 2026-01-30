@@ -1,10 +1,12 @@
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
 
 export function HeroSection() {
   const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
 
   return (
-    <section className="flex flex-col overflow-hidden w-full h-screen relative items-center justify-center">
+    <section id="hero" className="flex flex-col overflow-hidden w-full h-screen relative items-center justify-center">
       {/* Gradient Overlays */}
       <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-[#050505] z-10 pointer-events-none" />
       <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-transparent to-[#050505] z-10 pointer-events-none" />
@@ -27,18 +29,28 @@ export function HeroSection() {
         </h1>
 
         {/* Description */}
-        <p className="md:text-xl leading-relaxed text-lg font-medium max-w-2xl mx-auto mb-10 text-gray-500">
+        <p className="md:text-xl leading-relaxed text-lg font-medium max-w-2xl mx-auto mb-3 text-gray-500">
           200K+ AI Twins built on personal user data deliver authentic survey results, in minutes. 
-          No human-bias. No long waits. Just Instant Validation.
+          No human bias. No long waits. Just Instant Validation.
+        </p>
+        {/* Footnote */}
+        <p className="text-xs text-gray-600 font-mono mb-10 max-w-2xl mx-auto">
+          Mood-congruent bias + Interpretation bias
         </p>
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <button
-            onClick={() => navigate('/agent')}
+            onClick={() => {
+              if (isAuthenticated) {
+                navigate('/survey')
+              } else {
+                navigate('/login')
+              }
+            }}
             className="bg-[#FF3B00] px-8 py-4 font-bold text-sm uppercase tracking-widest transition-all w-full sm:w-auto btn-magnetic hover:bg-white hover:shadow-lg hover:shadow-[#FF3B00]/20 text-black"
           >
-            Launch Survey →
+            Launch Survey Now →
           </button>
           <button
             onClick={() => {

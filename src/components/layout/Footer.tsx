@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { toast } from 'react-toastify'
 
 export function Footer() {
   const [email, setEmail] = useState('')
@@ -6,12 +7,12 @@ export function Footer() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // Handle email submission
-    console.log('Email submitted:', email)
+    toast.success(`Thank you! We'll contact you at ${email}`)
     setEmail('')
   }
 
   return (
-    <footer className="bg-[#020202] pt-32 pb-10 px-6 border-t relative overflow-hidden border-white/10">
+    <footer className="bg-[#020202] pt-15 pb-10 px-6 border-t relative overflow-hidden border-white/10">
       {/* Background Text */}
       <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none select-none pointer-events-none opacity-5">
         <span className="text-[15vw] font-display font-black whitespace-nowrap-ml-10 text-white">

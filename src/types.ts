@@ -11,6 +11,12 @@ export interface AgentSummary {
   response_count: number
 }
 
+export interface PolymarketData {
+  yesPrice: number
+  noPrice: number
+  volume: string
+}
+
 export interface SurveyQuestion {
   id: string
   question: string
@@ -20,6 +26,9 @@ export interface SurveyQuestion {
   cohortCount?: number | null
   isCheckingCohort?: boolean
   selectedUserCount?: number | null
+  isPolymarket?: boolean
+  marketId?: string
+  polymarketData?: PolymarketData
 }
 
 export interface QuestionResult {
@@ -49,6 +58,19 @@ export interface MultiSurveyResult {
 }
 
 export type AgentMode = '1x' | '3x' | '5x'
+
+export type TabType = 'executive' | 'methodology' | 'patterns' | 'responses'
+
+export interface SurveyHistoryItem {
+  id: string
+  surveyId: string
+  question: string
+  participantCount: number
+  creditsUsed: number
+  status: string
+  createdAt: string
+  completedAt: string | null
+}
 
 // ============================================================================
 // Enhanced Survey Response Types
@@ -175,6 +197,7 @@ export interface Methodology {
   distribution_method: string
   agents_per_platform: Record<string, number>
   reasoning_method: string
+  limitations?: string[]
 }
 
 export interface PerformanceMetrics {
@@ -364,6 +387,28 @@ export interface CompetitiveTracking {
   win_loss_analysis: WinLossAnalysis
 }
 
+export interface RespondentArchetype {
+  archetype_name: string
+  estimated_percentage: number
+  description: string
+  typical_responses?: { question_id: string; typical_choice: string }[]
+}
+
+export interface CrossQuestionPatterns {
+  respondent_archetypes?: RespondentArchetype[]
+  response_correlations?: Array<{
+    correlation: string
+    strength: 'strong' | 'weak'
+    description: string
+    questions_involved?: string[]
+  }>
+  recurring_reasoning_threads?: Array<{
+    thread: string
+    description: string
+    questions_present?: string[]
+  }>
+}
+
 export interface EnhancedManagerSurveyResponse {
   question: string
   options: string[]
@@ -393,6 +438,12 @@ export interface EnhancedManagerSurveyResponse {
   risks_and_blindspots: RiskOrBlindSpot[]
   methodology: Methodology
   performance_metrics: PerformanceMetrics
+  cross_question_patterns?: CrossQuestionPatterns
+  cohort_profile?: {
+    based_on_query?: string
+    based_on_responses?: string
+    notable_characteristics?: string[]
+  }
   implementation_roadmap?: ImplementationRoadmap
   campaign_messaging?: CampaignMessaging
   jobs_to_be_done?: JobsToBeDoneAnalysis

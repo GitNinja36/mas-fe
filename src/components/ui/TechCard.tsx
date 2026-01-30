@@ -4,7 +4,7 @@ interface TechCardProps {
   children: React.ReactNode
   className?: string
   style?: React.CSSProperties
-  variant?: 'default' | 'premium' | 'glow' | 'floating'
+  variant?: 'default' | 'premium' | 'glow' | 'floating' | 'ghost'
   compact?: boolean
 }
 
@@ -20,10 +20,11 @@ export function TechCard({
       'bg-[#0a0a0a] backdrop-blur-md border border-white/10 shadow-lg hover:shadow-xl hover:shadow-[#FF3B00]/10 hover:border-white/20',
     premium:
       'bg-gradient-to-br from-[#0a0a0a] to-[#080808] backdrop-blur-lg border border-white/10 shadow-xl hover:shadow-2xl hover:shadow-[#FF3B00]/15 hover:border-[#FF3B00]/30',
-    glow: 
+    glow:
       'bg-[#080808] backdrop-blur-md border border-[#FF3B00]/20 shadow-xl shadow-[#FF3B00]/5 hover:shadow-2xl hover:shadow-[#FF3B00]/20 hover:border-[#FF3B00]/40',
     floating:
-      'bg-[#080808] backdrop-blur-xl border border-white/10 shadow-2xl hover:shadow-[#FF3B00]/20 hover:border-[#FF3B00]/30 relative overflow-hidden'
+      'bg-[#080808] backdrop-blur-xl border border-white/10 shadow-2xl hover:shadow-[#FF3B00]/20 hover:border-[#FF3B00]/30 relative overflow-hidden',
+    ghost: 'bg-transparent border-0 shadow-none'
   }
 
   const padding = compact ? 'p-6 md:p-8' : 'p-8 md:p-10'
