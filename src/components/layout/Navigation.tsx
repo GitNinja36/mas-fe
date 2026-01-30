@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useHealthCheck } from '../../hooks/useHealthCheck'
 import { useAuth } from '../../context/AuthContext'
 import { User, LogOut, Coins, LayoutDashboard, FileText, Menu, X, Plus, ChevronRight } from 'lucide-react'
+import iconLogo from '../../assets/IMG_6248.PNG'
+import banzaLogo from '../../assets/Banza_Logo.png'
 
 export function Navigation() {
   const location = useLocation()
@@ -50,8 +52,9 @@ export function Navigation() {
       <>
         {/* Mobile Header */}
         <div className="md:hidden fixed top-0 w-full z-50 bg-[#050505]/90 backdrop-blur-md border-b border-white/5 h-16 flex items-center justify-between px-4">
-          <Link to="/" className="flex items-center gap-1">
-            <span className="text-white font-bold font-display text-lg">BANZA</span>
+          <Link to="/" className="flex items-center gap-2" aria-label="Banza home">
+            <img src={iconLogo} width={32} height={32} alt="" className="w-8 h-8 object-contain" />
+            <img src={banzaLogo} width={72} height={20} alt="Banza" className="h-5 object-contain" />
           </Link>
           <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-white">
             {mobileMenuOpen ? <X /> : <Menu />}
@@ -61,22 +64,11 @@ export function Navigation() {
         {/* Sidebar (Desktop & Mobile Drawer) */}
         <nav className={`fixed top-0 left-0 h-full w-64 bg-[#050505] border-r border-white/5 z-[60] transform transition-transform duration-300 ease-in-out md:translate-x-0 ${mobileMenuOpen ? 'translate-x-0 pt-20' : '-translate-x-full md:pt-0'}`}>
           <div className="flex flex-col h-full p-6">
-            {/* Logo area */}
-            <div className="hidden md:flex items-center gap-2 mb-10 px-2 mt-2">
-              <img
-                src="/src/assets/IMG_6248.PNG"
-                height="32"
-                width="32"
-                alt="Logo"
-                className="w-10 h-8"
-              />
-              <img
-                src="/src/assets/Banza_Logo.png"
-                height="24"
-                alt="Banza"
-                className="h-6 mt-1"
-              />
-            </div>
+            {/* Logo area — clickable, links to home */}
+            <Link to="/" className="hidden md:flex items-center gap-2 mb-10 px-2 mt-2 group">
+              <img src={iconLogo} width={32} height={32} alt="" className="w-8 h-8 object-contain" />
+              <img src={banzaLogo} width={80} height={24} alt="Banza" className="h-6 object-contain opacity-90 group-hover:opacity-100 transition-opacity" />
+            </Link>
 
             {/* User Profile Summary (Top of Sidebar) */}
             <div className="mb-8 p-4 rounded-xl bg-white/5 border border-white/10">
@@ -159,23 +151,10 @@ export function Navigation() {
   return (
     <nav className="fixed top-0 w-full z-50 border-b bg-[#050505]/80 backdrop-blur-md border-white/5">
       <div className="max-w-7xl mx-auto px-3 h-20 flex justify-between items-center">
-        {/* Logo */}
-        <Link to="/" className="group flex items-center gap-1">
-          <img
-            src="/src/assets/IMG_6248.PNG"
-            height="40"
-            width="40"
-            alt="Logo"
-          />
-          <span className="group-hover:text-[#FF3B00] transition-colors text-xl font-bold tracking-tighter font-display text-white">
-            <img
-              src="/src/assets/Banza_Logo.png"
-              height="70"
-              width="70"
-              alt="Logo"
-              className="mt-1"
-            />
-          </span>
+        {/* Logo — single link to home, local assets */}
+        <Link to="/" className="group flex items-center gap-2" aria-label="Banza home">
+          <img src={iconLogo} width={40} height={40} alt="" className="w-10 h-10 object-contain" />
+          <img src={banzaLogo} width={100} height={28} alt="Banza" className="h-7 object-contain opacity-90 group-hover:opacity-100 transition-opacity" />
         </Link>
 
         {/* Public Nav Links (No Numeric Labels) */}
