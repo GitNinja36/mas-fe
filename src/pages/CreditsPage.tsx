@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   CreditCard,
   History,
@@ -14,8 +14,9 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { Navigation } from '../components/layout/Navigation';
 import { toast } from 'react-toastify';
+import { getCreditHistory } from '../lib/authApi';
 
-// --- Types & Mock Data ---
+// --- Types (all data from server) ---
 
 interface Transaction {
   id: string;
@@ -27,16 +28,14 @@ interface Transaction {
   invoiceUrl?: string;
 }
 
-const HISTORY_DATA: Transaction[] = [
-  { id: 'tx_1', type: 'USAGE', description: 'Survey: Gen Z Shopping Habits', amount: -450, date: 'Oct 24, 2025', status: 'SUCCESS' },
-  { id: 'tx_2', type: 'PURCHASE', description: 'Pro Credit Pack (5,000)', amount: 5000, date: 'Oct 20, 2025', status: 'SUCCESS', invoiceUrl: '#' },
-  { id: 'tx_3', type: 'USAGE', description: 'Survey: SaaS Pricing', amount: -120, date: 'Oct 18, 2025', status: 'SUCCESS' },
-  { id: 'tx_4', type: 'USAGE', description: 'Agent Mode Testing', amount: -50, date: 'Oct 15, 2025', status: 'SUCCESS' },
-  { id: 'tx_5', type: 'USAGE', description: 'Market Analysis: EV Trends', amount: -300, date: 'Oct 12, 2025', status: 'SUCCESS' },
-  { id: 'tx_6', type: 'PURCHASE', description: 'Starter Pack (1,000)', amount: 1000, date: 'Oct 10, 2025', status: 'SUCCESS', invoiceUrl: '#' },
-  { id: 'tx_7', type: 'USAGE', description: 'Concept Test: New Logo', amount: -75, date: 'Oct 08, 2025', status: 'SUCCESS' },
-  { id: 'tx_8', type: 'USAGE', description: 'Audience Discovery', amount: -200, date: 'Oct 05, 2025', status: 'SUCCESS' },
-];
+/** Map backend status to display status */
+function normalizeStatus(status: string): 'SUCCESS' | 'PENDING' | 'FAILED' {
+  const s = (status || '').toLowerCase();
+  if (s === 'completed' || s === 'success') return 'SUCCESS';
+  if (s === 'pending') return 'PENDING';
+  if (s === 'failed') return 'FAILED';
+  return 'SUCCESS';
+}
 
 const PRICING_PACKS = [
   { credits: 1000, price: '$19', label: 'Starter', features: ['Ideal for testing', 'Standard Support'] },
@@ -142,8 +141,55 @@ const HistoryRow = ({ tx, onDownload }: { tx: Transaction, onDownload: (tx: Tran
 const CreditsPage = () => {
   const [activeTab, setActiveTab] = useState<'ALL' | 'USAGE' | 'PURCHASES'>('ALL');
   const [currentPage, setCurrentPage] = useState(1);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [isLoadingTransactions, setIsLoadingTransactions] = useState(true);
+  const [transactionError, setTransactionError] = useState<string | null>(null);
   const itemsPerPage = 5;
   const { credits, isAuthenticated } = useAuth();
+
+  // Fetch transaction history from server (no static/mock data)
+  const fetchTransactions = useCallback(async () => {
+    if (!isAuthenticated) {
+      setTransactions([]);
+      setIsLoadingTransactions(false);
+      return;
+    }
+
+    try {
+      setIsLoadingTransactions(true);
+      setTransactionError(null);
+      const history = await getCreditHistory();
+
+      const transformedTransactions: Transaction[] = history.map((tx) => {
+        const credits = Number(tx.credits) || 0;
+        return {
+          id: tx.id,
+          type: 'PURCHASE' as const,
+          description: `${credits.toLocaleString()} Credits Pack`,
+          amount: credits,
+          date: new Date(tx.createdAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          }),
+          status: normalizeStatus(tx.status),
+          invoiceUrl: tx.transactionId ? '#' : undefined,
+        };
+      });
+
+      setTransactions(transformedTransactions);
+    } catch (error: any) {
+      console.error('Failed to fetch transaction history:', error);
+      setTransactionError(error.message || 'Failed to load transaction history');
+      setTransactions([]);
+    } finally {
+      setIsLoadingTransactions(false);
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [fetchTransactions]);
 
   // Calculate percentage for progress bar
   const total = credits?.totalCredits || 1;
@@ -167,7 +213,7 @@ const CreditsPage = () => {
   };
 
   // Pagination Logic
-  const filteredHistory = HISTORY_DATA.filter(tx =>
+  const filteredHistory = transactions.filter(tx =>
     activeTab === 'ALL' ||
     (activeTab === 'USAGE' && tx.type === 'USAGE') ||
     (activeTab === 'PURCHASES' && tx.type === 'PURCHASE')
@@ -308,13 +354,30 @@ const CreditsPage = () => {
 
           {/* Ledger List */}
           <div className="divide-y divide-white/5">
-            {paginatedHistory.length > 0 ? (
+            {isLoadingTransactions ? (
+              <div className="p-12 text-center">
+                <div className="inline-block w-8 h-8 border-2 border-[#FF3B00] border-t-transparent rounded-full animate-spin mb-4"></div>
+                <p className="text-gray-500 font-mono text-sm">Loading transaction history...</p>
+              </div>
+            ) : transactionError ? (
+              <div className="p-8 text-center">
+                <p className="text-red-400 font-mono text-sm mb-2">⚠️ {transactionError}</p>
+                <button
+                  onClick={() => fetchTransactions()}
+                  className="px-4 py-2 text-xs font-mono text-white bg-white/10 hover:bg-white/20 rounded-lg border border-white/10 transition-colors"
+                >
+                  Retry
+                </button>
+              </div>
+            ) : paginatedHistory.length > 0 ? (
               paginatedHistory.map((tx) => (
                 <HistoryRow key={tx.id} tx={tx} onDownload={handleDownloadInvoice} />
               ))
             ) : (
               <div className="p-8 text-center text-gray-500 font-mono text-sm">
-                No transactions found for this period.
+                {activeTab === 'ALL'
+                  ? 'No transactions yet. Purchase credits to get started!'
+                  : `No ${activeTab.toLowerCase()} transactions found.`}
               </div>
             )}
 

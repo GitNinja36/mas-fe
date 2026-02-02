@@ -4,9 +4,11 @@ import { cn } from '@/lib/utils'
 import {
   HeroSection,
   MarqueeSection,
+  StopBuildingSection,
   BentoFeatures,
   PipelineSection,
   DeveloperSection,
+  DecisionEngineSection,
   PricingSection,
   CTASection
 } from '../components/home'
@@ -72,8 +74,10 @@ export default function HomePage() {
         {/* Rest of the sections without spotlight */}
         <div className="bg-[#050505]">
           <div id="core"><BentoFeatures /></div>
+          <StopBuildingSection />
           <div id="how-it-works"><PipelineSection /></div>
           <DeveloperSection />
+          <DecisionEngineSection />
           <div id="pricing"><PricingSection /></div>
           <CTASection />
         </div>

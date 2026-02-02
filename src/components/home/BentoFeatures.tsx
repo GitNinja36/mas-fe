@@ -191,7 +191,7 @@ export function BentoFeatures() {
               /// CORE
             </span>
             <h2 className="font-display font-bold text-4xl md:text-5xl text-white">
-              Survey Intelligence
+              Decision Intelligence
             </h2>
           </div>
           <div className="text-right mt-4 md:mt-0">
@@ -199,8 +199,8 @@ export function BentoFeatures() {
               <span className="w-2 h-2 bg-green-500 rounded-full animate-blink" />
               <span className="font-mono text-xs text-white">AGENTS: ACTIVE 24/7</span>
             </div>
-            <p className="text-gray-500 font-mono text-xs uppercase tracking-widest">
-              AI Twins Online: +100k
+            <p className="text-gray-500 font-mono text-xs tracking-widest max-w-xs ml-auto">
+              AI Twins trained by humans, mimicking digital human behavior!
             </p>
           </div>
         </div>
@@ -229,7 +229,8 @@ export function BentoFeatures() {
               </div>
               <h3 className="font-display font-bold text-2xl mb-2 text-white">AI Twin Synthesis</h3>
               <p className="text-sm max-w-sm text-gray-300">
-              Individual AI twin personas fetching on-demand data streams from users across verified self-attested data from 20+ apps, personal interactions, opinions and behavioral signals.
+                Each AI twin behaves like a real buyer with distinct preferences gathered
+                from 20+ apps, personal interactions, opinions and behavioral signals.
               </p>
             </div>
           </div>

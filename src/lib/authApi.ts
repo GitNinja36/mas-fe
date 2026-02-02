@@ -1,4 +1,5 @@
-const TS_SERVER_BASE = import.meta.env.VITE_TS_SERVER_BASE ?? 'http://localhost:1556'
+// Single API gateway; use same base as rest of app for production (e.g. Vercel)
+const TS_SERVER_BASE = import.meta.env.VITE_TS_SERVER_BASE ?? import.meta.env.VITE_API_BASE ?? 'http://localhost:1556'
 
 export interface LoginRequest {
   email: string
@@ -164,13 +165,13 @@ export async function refreshAccessToken(): Promise<AuthResponse | null> {
 
     const result = await response.json()
     const authData = result.data || result
-    
+
     if (authData.accessToken) {
       localStorage.setItem('accessToken', authData.accessToken)
       localStorage.setItem('refreshToken', authData.refreshToken)
       return authData
     }
-    
+
     return null
   } catch (error) {
     console.error('Token refresh error:', error)
@@ -183,7 +184,7 @@ export async function refreshAccessToken(): Promise<AuthResponse | null> {
 // Get valid access token, refreshing if necessary
 export async function getValidAccessToken(): Promise<string | null> {
   let accessToken = localStorage.getItem('accessToken')
-  
+
   if (!accessToken) {
     return null
   }
@@ -204,14 +205,14 @@ export async function getValidAccessToken(): Promise<string | null> {
 export function isAuthenticated(): boolean {
   const token = localStorage.getItem('accessToken')
   if (!token) return false
-  
+
   // Check if token is expired
   if (isTokenExpired(token)) {
     // Token exists but is expired - we'll try to refresh on next API call
     // For now, return true if refresh token exists
     return !!localStorage.getItem('refreshToken')
   }
-  
+
   return true
 }
 
@@ -285,6 +286,69 @@ export async function getCreditSummary(): Promise<CreditSummary> {
       }
     }
     console.error('Get credit summary error:', error)
+    throw error
+  }
+}
+
+export interface CreditTransaction {
+  id: string
+  credits: number
+  amount: number
+  paymentMethod: string | null
+  status: string
+  transactionId: string | null
+  createdAt: string
+}
+
+export async function getCreditHistory(): Promise<CreditTransaction[]> {
+  try {
+    // Get valid token (will refresh if expired)
+    const token = await getValidAccessToken()
+    if (!token) {
+      throw new Error('Authentication required. Please login.')
+    }
+
+    const response = await fetch(`${TS_SERVER_BASE}/credit/history`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    })
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        // Token might be invalid, try refreshing once
+        const refreshed = await refreshAccessToken()
+        if (refreshed?.accessToken) {
+          // Retry with new token
+          const retryResponse = await fetch(`${TS_SERVER_BASE}/credit/history`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${refreshed.accessToken}`
+            },
+          })
+          if (retryResponse.ok) {
+            const result = await retryResponse.json()
+            return result.data || result || []
+          }
+        }
+        throw new Error('Authentication required. Please login.')
+      }
+      const errorData = await response.json().catch(() => ({}))
+      throw new Error(errorData.message || `Failed to fetch credit history: ${response.status}`)
+    }
+
+    const result = await response.json()
+    const data = result.data ?? result
+    return Array.isArray(data) ? data : []
+  } catch (error: any) {
+    if (error.message?.includes('Failed to fetch') || error.message?.includes('Load failed') || error?.name === 'TypeError') {
+      console.warn('Credit history service unavailable - ts_server may not be reachable')
+      throw new Error('Cannot reach server. Check your connection and try again.')
+    }
+    console.error('Get credit history error:', error)
     throw error
   }
 }
