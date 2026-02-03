@@ -18,7 +18,7 @@ const TIERS: PricingTier[] = [
     description: 'For founders who validate before they build. Turn early ideas into informed direction within minutes.',
     features: [
       '3 validation reports per month',
-      'Recommended panel size (50–100 AI twins)',
+      'Recommended panel size (50-100 AI twins)',
       'Single and multi-question surveys',
       'Standard cohort selection',
       'Decision verdict + reasoning',
@@ -101,21 +101,21 @@ export function PricingSection() {
   }
 
   return (
-    <section id="pricing" className="skew-target py-32 px-6 bg-[#050505] relative z-20">
+    <section id="pricing" className="skew-target py-20 px-6 bg-[#050505] relative z-20">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <span className="text-[#FF3B00] font-mono text-xs tracking-widest uppercase mb-4 block">Flexible Plans</span>
-          <h2 className="font-display font-bold text-4xl md:text-5xl text-white mb-4">Pricing</h2>
-          <p className="text-gray-400">Choose the plan that fits your validation velocity.</p>
+        <div className="text-center mb-10">
+          <span className="text-[#FF3B00] font-mono text-[10px] tracking-widest uppercase mb-3 block">Flexible Plans</span>
+          <h2 className="font-display font-bold text-3xl md:text-4xl text-white mb-3">Pricing</h2>
+          <p className="text-gray-400 text-sm">Choose the plan that fits your validation velocity.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {TIERS.map((tier) => (
             <div
               key={tier.name}
-              className={`relative rounded-xl p-6 flex flex-col transition-all duration-300 group hover:-translate-y-2 ${tier.badge
-                  ? 'bg-gradient-to-b from-[#FF3B00]/10 to-[#0a0a0a] border border-[#FF3B00]/30 shadow-[0_0_30px_rgba(255,59,0,0.1)]'
-                  : 'bg-[#0a0a0a] border border-white/10 hover:border-white/20'
+              className={`relative rounded-xl p-5 flex flex-col transition-all duration-300 group hover:-translate-y-2 ${tier.badge
+                ? 'bg-gradient-to-b from-[#FF3B00]/10 to-[#0a0a0a] border border-[#FF3B00]/30 shadow-[0_0_30px_rgba(255,59,0,0.1)]'
+                : 'bg-[#0a0a0a] border border-white/10 hover:border-white/20'
                 }`}
             >
               {tier.badge && (
@@ -124,23 +124,23 @@ export function PricingSection() {
                 </div>
               )}
 
-              <div className="mb-8">
-                <h3 className="font-display font-bold text-xl text-white mb-2">{tier.name}</h3>
-                <div className="flex items-baseline gap-1 mb-4">
-                  <span className="text-4xl font-bold text-white tracking-tight">{tier.price}</span>
-                  {tier.price !== 'Custom' && <span className="text-sm font-normal text-gray-500">/mo</span>}
+              <div className="mb-5">
+                <h3 className="font-display font-bold text-lg text-white mb-1">{tier.name}</h3>
+                <div className="flex items-baseline gap-1 mb-3">
+                  <span className="text-3xl font-bold text-white tracking-tight">{tier.price}</span>
+                  {tier.price !== 'Custom' && <span className="text-xs font-normal text-gray-500">/mo</span>}
                 </div>
-                <p className="text-xs text-gray-400 leading-relaxed min-h-[40px]">{tier.description}</p>
+                <p className="text-[11px] text-gray-400 leading-relaxed min-h-[32px]">{tier.description}</p>
               </div>
 
-              <div className="flex-grow mb-8 space-y-4">
+              <div className="flex-grow mb-5 space-y-3">
                 <div className="h-px bg-white/5 w-full" />
                 <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Features</p>
-                <ul className="space-y-3">
+                <ul className="space-y-2">
                   {tier.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-start gap-2.5 text-sm text-gray-300 group/item">
-                      <span className="text-[#FF3B00] mt-1 shrink-0 text-xs">●</span>
-                      <span className={`text-xs leading-relaxed ${feature.endsWith('plus:') ? 'font-semibold text-white' : 'text-gray-400 group-hover/item:text-gray-300 transition-colors'}`}>
+                    <li key={idx} className="flex items-start gap-2 text-sm text-gray-300 group/item">
+                      <span className="text-[#FF3B00] mt-1 shrink-0 text-[10px]">●</span>
+                      <span className={`text-[11px] pt-1 leading-snug ${feature.endsWith('plus:') ? 'font-semibold text-white' : 'text-gray-400 group-hover/item:text-gray-300 transition-colors'}`}>
                         {feature}
                       </span>
                     </li>
@@ -148,17 +148,17 @@ export function PricingSection() {
                 </ul>
               </div>
 
-              <div className="mt-auto pt-6 border-t border-white/5">
-                <div className="mb-4">
-                  <p className="text-[10px] text-gray-500 mb-1">Best for:</p>
-                  <p className="text-xs text-gray-300 line-clamp-2">{tier.bestFor}</p>
+              <div className="mt-auto pt-4 border-t border-white/5">
+                <div className="mb-3">
+                  <p className="text-[10px] text-gray-500 mb-0.5">Best for:</p>
+                  <p className="text-[11px] text-gray-300 line-clamp-2 leading-snug">{tier.bestFor}</p>
                 </div>
 
                 <button
                   onClick={handleCta}
                   className={`w-full py-3 rounded-lg font-bold text-xs uppercase tracking-widest transition-all ${tier.badge
-                      ? 'bg-[#FF3B00] text-black hover:bg-[#ff5722] hover:shadow-[0_0_20px_rgba(255,59,0,0.3)]'
-                      : 'bg-white/5 text-white border border-white/10 hover:bg-white/10 hover:border-white/20'
+                    ? 'bg-[#FF3B00] text-black hover:bg-[#ff5722] hover:shadow-[0_0_20px_rgba(255,59,0,0.3)]'
+                    : 'bg-white/5 text-white border border-white/10 hover:bg-white/10 hover:border-white/20'
                     }`}
                 >
                   {tier.ctaText}
@@ -169,21 +169,21 @@ export function PricingSection() {
         </div>
 
         {/* One-time validation card */}
-        <div className="mt-12 rounded-xl border border-white/10 bg-gradient-to-r from-[#0a0a0a] to-[#080808] p-8 md:p-10 relative overflow-hidden group">
+        <div className="mt-8 rounded-xl border border-white/10 bg-gradient-to-r from-[#0a0a0a] to-[#080808] p-6 relative overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-r from-[#FF3B00]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex-1 text-center md:text-left">
-              <h3 className="font-display font-bold text-2xl text-white mb-2">Need just one validation?</h3>
-              <p className="text-gray-400 mb-6 max-w-xl">Run a single decision-grade validation anytime without a subscription.</p>
+              <h3 className="font-display font-bold text-xl text-white mb-1">Need just one validation?</h3>
+              <p className="text-gray-400 text-sm mb-4 max-w-xl">Run a single decision-grade validation anytime without a subscription.</p>
 
               <div className="flex flex-col sm:flex-row items-center md:items-start gap-4 sm:gap-8">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-bold text-white">$12</span>
-                  <span className="text-sm text-gray-500">/ validation</span>
+                  <span className="text-3xl font-bold text-white">$12</span>
+                  <span className="text-xs text-gray-500">/ validation</span>
                 </div>
-                <div className="h-px w-full sm:w-px sm:h-12 bg-white/10" />
-                <p className="text-sm text-gray-400 max-w-xs text-center sm:text-left py-1">
+                <div className="h-px w-full sm:w-px sm:h-10 bg-white/10" />
+                <p className="text-xs text-gray-400 max-w-xs text-center sm:text-left py-1">
                   Perfect for quick idea checks, pricing tests, or messaging validation.
                 </p>
               </div>
@@ -199,8 +199,8 @@ export function PricingSection() {
         </div>
 
         {/* Tagline */}
-        <div className="text-center mt-20">
-          <p className="text-3xl md:text-4xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-gray-600 via-gray-400 to-gray-600">
+        <div className="text-center mt-12">
+          <p className="text-2xl md:text-3xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-gray-600 via-gray-400 to-gray-600">
             Decisions shouldn&apos;t take months
           </p>
         </div>

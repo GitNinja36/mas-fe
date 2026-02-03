@@ -167,7 +167,7 @@ export function Navigation() {
               document.getElementById('core')?.scrollIntoView({ behavior: 'smooth' })
             }
           }} className="transition-colors hover:text-white uppercase">
-            Core
+            Product
           </button>
           <button onClick={() => {
             if (location.pathname !== '/') {
@@ -177,7 +177,7 @@ export function Navigation() {
               document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })
             }
           }} className="transition-colors hover:text-white uppercase">
-            How It Works
+            Solution
           </button>
           <button onClick={() => {
             if (location.pathname !== '/') {

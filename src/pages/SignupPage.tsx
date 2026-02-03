@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { Footer } from '../components/layout/Footer'
 import { Mail, User, ArrowLeft } from 'lucide-react'
 import { signup } from '../lib/authApi'
-import { isValidGmail } from '../utils/gmailValidator'
+import { isAllowedLoginEmail } from '../utils/gmailValidator'
 
 export default function SignupPage() {
   const [email, setEmail] = useState('')
@@ -18,8 +18,8 @@ export default function SignupPage() {
     setError('')
 
     try {
-      if (!isValidGmail(email)) {
-        throw new Error('Please enter a valid Gmail address (6-30 characters, no consecutive dots, cannot start/end with dot)')
+      if (!isAllowedLoginEmail(email)) {
+        throw new Error('Please use a valid Gmail or @banza.xyz email address')
       }
       await signup(email, username)
       // Store email for OTP page

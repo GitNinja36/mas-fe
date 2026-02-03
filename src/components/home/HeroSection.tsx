@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { Check, ArrowRight } from 'lucide-react'
 
 export function HeroSection() {
   const navigate = useNavigate()
@@ -29,26 +30,35 @@ export function HeroSection() {
         </h1>
 
         {/* Description */}
-        <p className="md:text-xl leading-relaxed text-lg font-medium max-w-2xl mx-auto mb-8 text-gray-400 animate-fade-in-up animation-delay-200">
-          Run AI-twin powered market validation before you<br />
-          <span className="text-gray-200">Build, Launch, Invest.</span>
+        <p className="md:text-xl leading-relaxed text-lg font-medium max-w-2xl mx-auto mb-10 text-gray-400 animate-fade-in-up animation-delay-200">
+          Run AI-twin powered market validation before you
+          <span className="block mt-4 flex flex-wrap justify-center gap-3">
+            {['Build', 'Launch', 'Invest'].map((word, i) => (
+              <span key={word} className="inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-white font-bold tracking-wide shadow-lg shadow-black/20 hover:bg-white/10 hover:border-white/20 transition-all hover:-translate-y-1">
+                {word}
+              </span>
+            ))}
+          </span>
         </p>
 
         {/* Feature strips - Structured for Premium Feel */}
-        <div className="flex flex-wrap justify-center items-center gap-x-4 gap-y-2 mb-12 max-w-4xl mx-auto animate-fade-in-up animation-delay-300">
+        <div className="flex flex-wrap justify-center items-center gap-3 mb-14 max-w-5xl mx-auto animate-fade-in-up animation-delay-300">
           {[
             "No delays or bias",
             "Real human behavioral signals",
             "Decision-ready reports",
             "Designed for founders & product teams"
-          ].map((feature, index, array) => (
-            <div key={index} className="flex items-center gap-4">
-              <span className="text-xs font-mono text-gray-400 uppercase tracking-widest hover:text-white transition-colors cursor-default">
+          ].map((feature, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#0A0A0A]/80 border border-white/5 backdrop-blur-sm hover:border-[#FF3B00]/30 hover:bg-[#FF3B00]/5 transition-all group cursor-default"
+            >
+              <div className="w-5 h-5 rounded-full bg-[#FF3B00]/10 flex items-center justify-center group-hover:bg-[#FF3B00] transition-colors">
+                <Check size={12} className="text-[#FF3B00] group-hover:text-black transition-colors" />
+              </div>
+              <span className="text-xs font-mono text-gray-400 uppercase tracking-wider group-hover:text-white transition-colors">
                 {feature}
               </span>
-              {index < array.length - 1 && (
-                <span className="w-1 h-1 rounded-full bg-[#FF3B00]/50" />
-              )}
             </div>
           ))}
         </div>

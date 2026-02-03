@@ -30,7 +30,11 @@ export default {
         'float': 'float 8s ease-in-out infinite',
         'spotlight': 'spotlight 2s ease .75s 1 forwards',
         'spotlight-drift': 'spotlight-drift 2s ease-in-out infinite',
+        'spotlight-drift': 'spotlight-drift 2s ease-in-out infinite',
         'spotlight-drift-reverse': 'spotlight-drift-reverse 8s ease-in-out infinite',
+        'shimmer': 'shimmer 2s linear infinite',
+        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'float-slow': 'float 6s ease-in-out infinite',
       },
       keyframes: {
         marquee: {
@@ -142,6 +146,10 @@ export default {
             transform: 'translateX(200px)',
             opacity: '0.6',
           },
+        },
+        shimmer: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' }
         },
       },
     },

@@ -31,11 +31,11 @@ export default function HomePage() {
               "[background-image:linear-gradient(to_right,#333_1px,transparent_1px),linear-gradient(to_bottom,#333_1px,transparent_1px)]"
             )}
           />
-          
+
           {/* Animated Spotlight Beam */}
           <div className="pointer-events-none absolute inset-0 z-[1] overflow-visible">
             {/* Main Spotlight Beam - Moving Left to Right */}
-            <div 
+            <div
               className="absolute animate-spotlight-drift"
               style={{
                 top: '0px',
@@ -45,9 +45,9 @@ export default function HomePage() {
                 background: 'radial-gradient(ellipse 50% 80% at 50% 0%, rgba(255,255,255,0.5) 0%, transparent 70%)',
               }}
             />
-            
+
             {/* Secondary Beam - Moving Right to Left */}
-            <div 
+            <div
               className="absolute animate-spotlight-drift-reverse"
               style={{
                 top: '0px',
@@ -57,24 +57,24 @@ export default function HomePage() {
                 background: 'radial-gradient(ellipse 45% 75% at 50% 0%, rgba(255,255,255,0.4) 0%, transparent 70%)',
               }}
             />
-            
+
             {/* Ambient Base Glow */}
-            <div 
+            <div
               className="absolute top-0 left-0 right-0 h-[600px]"
               style={{
                 background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,255,255,0.2) 0%, transparent 60%)',
               }}
             />
           </div>
-          
+
           <HeroSection />
           <MarqueeSection />
         </div>
 
         {/* Rest of the sections without spotlight */}
         <div className="bg-[#050505]">
-          <div id="core"><BentoFeatures /></div>
           <StopBuildingSection />
+          <div id="core"><BentoFeatures /></div>
           <div id="how-it-works"><PipelineSection /></div>
           <DeveloperSection />
           <DecisionEngineSection />
